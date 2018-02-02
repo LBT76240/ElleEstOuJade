@@ -12,11 +12,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class HelloWorldAgent extends Agent {
 
-    // Class pour stocker les différents paramètre du joeur
+    // Classe pour stocker les différents paramètres du joueur
     class Stats {
         int age;
         int score;
-        // findGame est à true quand l'agent à trouvé un groupe pour jouer. Ainsi il est retiré du matchmaking.
+        // findGame est à true quand l'agent a trouvé un groupe pour jouer. Ainsi il est retiré du matchmaking.
         boolean findGame;
     }
     // Les stats de cet Agent
@@ -24,17 +24,17 @@ public class HelloWorldAgent extends Agent {
 
     // Le nombre total d'agents
     int maxAgent = 10;
-    // La list des stats des agents
+    // La liste des stats des agents
     ArrayList<Stats> listStatsPlayer= new ArrayList<Stats>();
 
-    // Son indice dans la list
+    // Son indice dans la liste
     int me;
 
     protected void setup() {
 
         me = Integer.valueOf(getLocalName());
 
-        // Tirage de l'age en Random entre 2 bornes
+        // Tirage de l'âge en Random entre 2 bornes
         int maxAge = 70;
         int minAge = 10;
         ownStats.age = ThreadLocalRandom.current().nextInt(minAge, maxAge + 1);
@@ -42,23 +42,23 @@ public class HelloWorldAgent extends Agent {
         int maxScore = 10000;
         int minScore = 0;
         ownStats.score = ThreadLocalRandom.current().nextInt(minScore, maxScore + 1);
-        // Au démarage le joueur est seul
+        // Au démarrage, le joueur est seul
         ownStats.findGame = false;
         System.out.println("Hello World! My name is "+getLocalName() + " Age : " + ownStats.age + " Score : " + ownStats.score);
 
-        // Variable des critères de différence. C'est un final int[] pour passer la varible dans la methode lambda
+        // Variable des critères de différence. C'est un final int[] pour passer la variable dans la méthode lambda
         final int[] ageDifference = {10};
-        // L'incrémentation quand il allége ses critères
+        // L'incrémentation quand il allège ses critères
         int ageInc = 10;
         final int[] scoreDifference = {1000};
         int scoreInc = 1000;
 
         // Pour commencer l'agent va dire à tous les autres ses stats.
-        // Dans un vrai jeu, il demanderait au serveur du Jeu les stats des joeurs dans la liste de matchmaking
+        // Dans un vrai jeu, il demanderait au serveur du jeu les stats des joueurs dans la liste de matchmaking
         for(int i = 0;i<maxAgent;i++) {
             // On récupère l'AID de l'agent i
             AID idI = new AID(String.valueOf(i),AID.ISLOCALNAME);
-            // On lui envoi l'age de l'agent ...
+            // On lui envoie l'âge de l'agent ...
             ACLMessage msgAge = new ACLMessage(ACLMessage.INFORM);
             msgAge.addReceiver(idI);
             msgAge.setOntology("AGE");
@@ -83,20 +83,20 @@ public class HelloWorldAgent extends Agent {
         }
 
 
-        // Variable qui s'encrément à chaque fois que l'agent réfléchi
-        // Tous les 10 fois, les critères sont allégé, pour evité les temps d'attente trop longue pour le joeur
+        // Variable qui s'encrémente à chaque fois que l'agent réfléchit
+        // Tous les 10 fois, les critères sont allégés, pour eviter les temps d'attente trop longs pour le joueur
         final int[] j = {1};
 
 
         addBehaviour(new TickerBehaviour(this,1000) {
             @Override
             protected void onTick() {
-                // Si le joeur est toujours dans le matchmaking
+                // Si le joueur est toujours dans le matchmaking
                 if(!ownStats.findGame) {
                     System.out.print(".");
-                    // On récupère les messages destiné à l'agent
+                    // On récupère les messages destinés à l'agent
                     ACLMessage msg = receive();
-                    // Si il y en a ...
+                    // S'il y en a ...
                     if (msg != null) {
                         // ... et tant qu'il y en a
                         while (msg != null) {
@@ -108,32 +108,32 @@ public class HelloWorldAgent extends Agent {
 
 
                                 if (msg.getOntology().equals("AGE")) {
-                                    // Si le message est un renseignement sur l'age on le stock
+                                    // Si le message est un renseignement sur l'âge on le stocke
                                     listStatsPlayer.get(indice).age = Integer.parseInt(msg.getContent());
                                 } else if (msg.getOntology().equals("SCORE")) {
-                                    // Si le message est un renseignement sur l'age on le score
+                                    // Si le message est un renseignement sur le score on le stocke
                                     listStatsPlayer.get(indice).score = Integer.parseInt(msg.getContent());
                                 } else if (msg.getOntology().equals("findGame")) {
-                                    // Si le message est un renseignement sur le boolean findGame on le stock
+                                    // Si le message est un renseignement sur le boolean findGame on le stocke
                                     if (msg.getContent().equals("true")) {
                                         listStatsPlayer.get(indice).findGame = true;
                                     } else {
                                         listStatsPlayer.get(indice).findGame = false;
                                     }
                                 } else if (msg.getOntology().equals("REQUEST")) {
-                                    // Si c'est un requete
+                                    // Si c'est une requête
                                     if (msg.getContent().equals("PLAY?")) {
-                                        // Si c'est une première demande pour Jouer ...
+                                        // Si c'est une première demande pour jouer ...
                                         if (Math.abs(listStatsPlayer.get(indice).age - ownStats.age) < ageDifference[0]
                                                 && Math.abs(listStatsPlayer.get(indice).score - ownStats.score) < scoreDifference[0]) {
-                                            // .. et que les critères du joeur est bon
+                                            // .. et que les critères du joueur sont bons
                                             AID idI = new AID(String.valueOf(indice), AID.ISLOCALNAME);
                                             ACLMessage msgScore = new ACLMessage(ACLMessage.INFORM);
                                             msgScore.addReceiver(idI);
                                             msgScore.setOntology("REQUEST");
                                             msgScore.setContent("OK");
                                             send(msgScore);
-                                            // On répond un request OK
+                                            // On répond une request OK
                                         }
 
                                         // Sinon on attend
@@ -177,15 +177,15 @@ public class HelloWorldAgent extends Agent {
 
 
                     } else {
-                        // Tous les 10 fois, les critères sont allégé, pour evité les temps d'attente trop longue pour le joeur
+                        // Toutes les 10 fois, les critères sont allégés, pour eviter les temps d'attente trop longs pour le joueur
                         if (j[0] % 10 == 0) {
                             ageDifference[0] = ageDifference[0] + ageInc;
                             scoreDifference[0] = scoreDifference[0] + scoreInc;
                         }
 
-                        // On parcours la liste des agents ...
+                        // On parcoure la liste des agents ...
                         for (int i = 0; i < maxAgent; i++) {
-                            // ... si c'est un autre agents encore dans le matchmaking ...
+                            // ... si c'est un autre agent encore dans le matchmaking ...
                             if (i != me && !listStatsPlayer.get(i).findGame) {
                                 // ... et que ses critères correspondent à nos attentes ...
                                 if (Math.abs(listStatsPlayer.get(i).age - ownStats.age) < ageDifference[0]
